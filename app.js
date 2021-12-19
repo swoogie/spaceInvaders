@@ -18,6 +18,7 @@ const state = {
   enemies: [],
   enemyW: 60,
   enemyNum: 18,
+  gameOver: false,
 };
 
 function setPosition($element, x, y) {
@@ -63,13 +64,13 @@ function createPew($container, x, y) {
 }
 
 function createEnemyPew($container, x, y) {
-    const $enemyPew = document.createElement("img");
-    $enemyPew.src = "assets/redpew.png";
-    $enemyPew.className = "pew";
-    $container.appendChild($enemyPew);
-    const enemyPew = { x, y, $enemyPew };
-    state.enemyPewPew.push(enemyPew);
-    setPosition($enemyPew, x, y);
+  const $enemyPew = document.createElement("img");
+  $enemyPew.src = "assets/redpew.png";
+  $enemyPew.className = "pew";
+  $container.appendChild($enemyPew);
+  const enemyPew = { x, y, $enemyPew };
+  state.enemyPewPew.push(enemyPew);
+  setPosition($enemyPew, x, y);
 }
 
 function deletePew(pewpew, pew, $pew) {
@@ -91,7 +92,7 @@ function updatePew() {
   const pewpew = state.pewpew;
   for (let i = 0; i < pewpew.length; i++) {
     const pew = pewpew[i];
-    pew.y -= 2;
+    pew.y -= 1.5;
     if (pew.y < 0) {
       deletePew(pewpew, pew, pew.$pew);
     }
@@ -112,20 +113,26 @@ function updatePew() {
 }
 
 function updateEnemyPew() {
-    const enemyPewPew = state.enemyPewPew;
-    for(let i = 0; i < enemyPewPew.length; i++) {
-        const enemyPew = enemyPewPew[i];
-        enemyPew.y += 2;
-        if(enemyPew.y > gameHeight-30){
-            deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
-        }
-        const enemyPewRect = enemyPew.$enemyPew.getBoundingClientRect()
-        const spaceshipRect = document.querySelector(".player").getBoundingClientRect();
-        if(collision(spaceshipRect, enemyPewRect)){
-            console.log("Game over");
-        }
-        setPosition(enemyPew.$enemyPew, enemyPew.x + state.enemyW/2, enemyPew.y+15);
+  const enemyPewPew = state.enemyPewPew;
+  for (let i = 0; i < enemyPewPew.length; i++) {
+    const enemyPew = enemyPewPew[i];
+    enemyPew.y += 1.5;
+    if (enemyPew.y > gameHeight - 30) {
+      deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
     }
+    const enemyPewRect = enemyPew.$enemyPew.getBoundingClientRect();
+    const spaceshipRect = document
+      .querySelector(".player")
+      .getBoundingClientRect();
+    if (collision(spaceshipRect, enemyPewRect)) {
+      state.gameOver = true;
+    }
+    setPosition(
+      enemyPew.$enemyPew,
+      enemyPew.x + state.enemyW / 2,
+      enemyPew.y + 15
+    );
+  }
 }
 
 function updatePlayer() {
@@ -151,7 +158,7 @@ function createEnemy($container, x, y) {
   $enemy.src = "assets/alien.png";
   $enemy.className = "enemy";
   $container.appendChild($enemy);
-  const cooldown = Math.floor(Math.random()*100);
+  const cooldown = Math.floor(Math.random() * 100);
   const enemy = { x, y, $enemy, cooldown };
   state.enemies.push(enemy);
   setSize($enemy, state.enemyW);
@@ -166,9 +173,9 @@ function updateEnemy($container) {
     var a = enemy.x + dx;
     var b = enemy.y - 50;
     setPosition(enemy.$enemy, a, b);
-    if(enemy.cooldown == 0) {
-        createEnemyPew($container, a, b);
-        enemy.cooldown = Math.floor(Math.random()*50)+100;
+    if (enemy.cooldown == 0) {
+      createEnemyPew($container, a, b);
+      enemy.cooldown = Math.floor(Math.random() * 50) + 100;
     }
     enemy.cooldown -= 0.25;
   }
@@ -186,26 +193,6 @@ function createEnemies($container) {
   }
 }
 
-function keyPress(event) {
-  if (event.keyCode === keyRight) {
-    state.moveRight = true;
-  } else if (event.keyCode === keyLeft) {
-    state.moveLeft = true;
-  } else if (event.keyCode === keySpace) {
-    state.shoot = true;
-  }
-}
-
-function keyRelease(event) {
-  if (event.keyCode === keyRight) {
-    state.moveRight = false;
-  } else if (event.keyCode === keyLeft) {
-    state.moveLeft = false;
-  } else if (event.keyCode === keySpace) {
-    state.shoot = false;
-  }
-}
-
 function update() {
   updatePlayer();
   updatePew();
@@ -213,14 +200,36 @@ function update() {
   updateEnemyPew();
 
   window.requestAnimationFrame(update);
+
+  if(state.gameOver) {
+      document.querySelector(".lose").style = "Display: block;";
+  } else if (state.enemies.length == 0){
+    document.querySelector(".win").style = "Display: block;";
+  }
 }
 
 const $container = document.querySelector(".main");
 createPlayer($container);
 createEnemies($container);
 
+window.addEventListener("keydown", () => {
+  if (event.keyCode === keyRight) {
+    state.moveRight = true;
+  } else if (event.keyCode === keyLeft) {
+    state.moveLeft = true;
+  } else if (event.keyCode === keySpace) {
+    state.shoot = true;
+  }
+});
 
-window.addEventListener("keydown", keyPress);
-window.addEventListener("keyup", keyRelease);
+window.addEventListener("keyup", () => {
+  if (event.keyCode === keyRight) {
+    state.moveRight = false;
+  } else if (event.keyCode === keyLeft) {
+    state.moveLeft = false;
+  } else if (event.keyCode === keySpace) {
+    state.shoot = false;
+  }
+});
 
 update();

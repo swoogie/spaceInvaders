@@ -1,7 +1,6 @@
 body{
     height: 100%;
     overflow: hidden;
-    color: #0eaa00;
     background-color: #272727;
 }
 
@@ -23,7 +22,7 @@ body{
     height: 600px;
     background: url(assets/background-blue.png);
     animation: scroll-background 2s linear infinite;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 10px #272727;
     position: relative;
     z-index: -2;
 }
@@ -36,13 +35,6 @@ body{
       background-position-y: 256px;
     }
   }
-
-header{
-    text-align: center;
-    background: #1f1f1f;
-    color: #fff;
-    padding: 5px;
-}
 
 footer{
     padding: 10px;
@@ -68,3 +60,27 @@ footer{
 .enemy {
     position: absolute;
 } 
+
+.lose {
+    display: none;
+    position: absolute;
+    background: #272727;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 10px #272727;
+    border-radius: 10px;
+    text-align: center;
+    animation: pop-in 1s;
+}
+
+.win {
+    display: none;
+    position: absolute;
+    background: #272727;
+    color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 10px #272727;
+    border-radius: 10px;
+    text-align: center;
+    animation: pop-in 1s;
+}
