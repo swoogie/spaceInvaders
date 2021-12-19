@@ -11,6 +11,7 @@ const state = {
   moveRight: false,
   moveLeft: false,
   shoot: false,
+  enemyPewPew: [],
   pewpew: [],
   cooldown: 0,
   spaceshipW: 50,
@@ -61,6 +62,16 @@ function createPew($container, x, y) {
   setPosition($pew, x, y);
 }
 
+function createEnemyPew($container, x, y) {
+    const $enemyPew = document.createElement("img");
+    $enemyPew.src = "assets/redpew.png";
+    $enemyPew.className = "pew";
+    $container.appendChild($enemyPew);
+    const enemyPew = { x, y, $enemyPew };
+    state.enemyPewPew.push(enemyPew);
+    setPosition($enemyPew, x, y);
+}
+
 function deletePew(pewpew, pew, $pew) {
   const index = pewpew.indexOf(pew);
   pewpew.splice(index, 1);
@@ -100,6 +111,23 @@ function updatePew() {
   }
 }
 
+function updateEnemyPew() {
+    const enemyPewPew = state.enemyPewPew;
+    for(let i = 0; i < enemyPewPew.length; i++) {
+        const enemyPew = enemyPewPew[i];
+        enemyPew.y += 2;
+        if(enemyPew.y > gameHeight-30){
+            deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
+        }
+        const enemyPewRect = enemyPew.$enemyPew.getBoundingClientRect()
+        const spaceshipRect = document.querySelector(".player").getBoundingClientRect();
+        if(collision(spaceshipRect, enemyPewRect)){
+            console.log("Game over");
+        }
+        setPosition(enemyPew.$enemyPew, enemyPew.x + state.enemyW/2, enemyPew.y+15);
+    }
+}
+
 function updatePlayer() {
   if (state.moveLeft) {
     state.x -= 3;
@@ -123,13 +151,14 @@ function createEnemy($container, x, y) {
   $enemy.src = "assets/alien.png";
   $enemy.className = "enemy";
   $container.appendChild($enemy);
-  const enemy = { x, y, $enemy };
+  const cooldown = Math.floor(Math.random()*100);
+  const enemy = { x, y, $enemy, cooldown };
   state.enemies.push(enemy);
   setSize($enemy, state.enemyW);
   setPosition($enemy, x, y);
 }
 
-function updateEnemy() {
+function updateEnemy($container) {
   const dx = Math.sin(Date.now() / 1000) * 90 + 80;
   const enemies = state.enemies;
   for (let i = 0; i < enemies.length; i++) {
@@ -137,6 +166,11 @@ function updateEnemy() {
     var a = enemy.x + dx;
     var b = enemy.y - 50;
     setPosition(enemy.$enemy, a, b);
+    if(enemy.cooldown == 0) {
+        createEnemyPew($container, a, b);
+        enemy.cooldown = Math.floor(Math.random()*50)+100;
+    }
+    enemy.cooldown -= 0.25;
   }
 }
 
@@ -175,7 +209,8 @@ function keyRelease(event) {
 function update() {
   updatePlayer();
   updatePew();
-  updateEnemy();
+  updateEnemy($container);
+  updateEnemyPew();
 
   window.requestAnimationFrame(update);
 }
@@ -183,6 +218,7 @@ function update() {
 const $container = document.querySelector(".main");
 createPlayer($container);
 createEnemies($container);
+
 
 window.addEventListener("keydown", keyPress);
 window.addEventListener("keyup", keyRelease);

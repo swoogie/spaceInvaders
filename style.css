@@ -58,6 +58,13 @@ footer{
     z-index: -1;
 }
 
+.enemyPew {
+    position: absolute;
+    margin-left: -3.5px;
+    height: 25px;
+    z-index: -1;
+}
+
 .enemy {
     position: absolute;
 } 
