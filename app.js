@@ -2,8 +2,8 @@ const keyRight = 68;
 const keyLeft = 65;
 const keySpace = 32;
 
-const gameWidth = 800;
-const gameHeight = 600;
+const gameWidth = 1000;
+const gameHeight = 800;
 
 const state = {
   x: 0,
@@ -17,7 +17,7 @@ const state = {
   spaceshipW: 50,
   enemies: [],
   enemyW: 60,
-  enemyNum: 18,
+  enemyNum: 24,
   gameOver: false,
 };
 
@@ -125,6 +125,12 @@ function updateEnemyPew() {
       .querySelector(".player")
       .getBoundingClientRect();
     if (collision(spaceshipRect, enemyPewRect)) {
+      deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
+      const spaceship = document.querySelector(".player");
+      const bg = document.querySelector(".main");
+      bg.style = "animation: none;"
+      spaceship.style = "display: none;";
+      
       state.gameOver = true;
     }
     setPosition(
@@ -166,7 +172,7 @@ function createEnemy($container, x, y) {
 }
 
 function updateEnemy($container) {
-  const dx = Math.sin(Date.now() / 1000) * 90 + 80;
+  const dx = Math.sin(Date.now() / 1000) * 90 + 100;
   const enemies = state.enemies;
   for (let i = 0; i < enemies.length; i++) {
     const enemy = enemies[i];
@@ -192,6 +198,8 @@ function createEnemies($container) {
     createEnemy($container, i * 80, 260);
   }
 }
+
+var reqID;
 
 function update() {
   updatePlayer();
