@@ -2,8 +2,8 @@ const keyRight = 68;
 const keyLeft = 65;
 const keySpace = 32;
 
-const gameWidth = 1000;
-const gameHeight = 800;
+const gameWidth = document.querySelector(".main").clientWidth;
+const gameHeight = document.querySelector(".main").clientHeight;
 
 const state = {
   x: 0,
@@ -11,13 +11,13 @@ const state = {
   moveRight: false,
   moveLeft: false,
   shoot: false,
-  enemyPewPew: [],
+  alienPewPew: [],
   pewpew: [],
   cooldown: 0,
   spaceshipW: 50,
-  enemies: [],
-  enemyW: 60,
-  enemyNum: 24,
+  aliens: [],
+  alienW: 60,
+  alienNum: 24,
   gameOver: false,
 };
 
@@ -63,14 +63,14 @@ function createPew($container, x, y) {
   setPosition($pew, x, y);
 }
 
-function createEnemyPew($container, x, y) {
-  const $enemyPew = document.createElement("img");
-  $enemyPew.src = "assets/redpew.png";
-  $enemyPew.className = "pew";
-  $container.appendChild($enemyPew);
-  const enemyPew = { x, y, $enemyPew };
-  state.enemyPewPew.push(enemyPew);
-  setPosition($enemyPew, x, y);
+function createalienPew($container, x, y) {
+  const $alienPew = document.createElement("img");
+  $alienPew.src = "assets/redpew.png";
+  $alienPew.className = "pew";
+  $container.appendChild($alienPew);
+  const alienPew = { x, y, $alienPew };
+  state.alienPewPew.push(alienPew);
+  setPosition($alienPew, x, y);
 }
 
 function deletePew(pewpew, pew, $pew) {
@@ -98,45 +98,40 @@ function updatePew() {
     }
     setPosition(pew.$pew, pew.x, pew.y);
     const pewRect = pew.$pew.getBoundingClientRect();
-    const enemies = state.enemies;
-    for (let j = 0; j < enemies.length; j++) {
-      const enemy = enemies[j];
+    const aliens = state.aliens;
+    for (let j = 0; j < aliens.length; j++) {
+      const enemy = aliens[j];
       const enemyRect = enemy.$enemy.getBoundingClientRect();
       if (collision(enemyRect, pewRect)) {
         deletePew(pewpew, pew, pew.$pew);
-        const index = enemies.indexOf(enemy);
-        enemies.splice(index, 1);
+        const index = aliens.indexOf(enemy);
+        aliens.splice(index, 1);
         $container.removeChild(enemy.$enemy);
       }
     }
   }
 }
 
-function updateEnemyPew() {
-  const enemyPewPew = state.enemyPewPew;
-  for (let i = 0; i < enemyPewPew.length; i++) {
-    const enemyPew = enemyPewPew[i];
-    enemyPew.y += 1.5;
-    if (enemyPew.y > gameHeight - 30) {
-      deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
+function updatealienPew() {
+  const alienPewPew = state.alienPewPew;
+  for (let i = 0; i < alienPewPew.length; i++) {
+    const alienPew = alienPewPew[i];
+    alienPew.y += 1.5;
+    if (alienPew.y > gameHeight - 30) {
+      deletePew(alienPewPew, alienPew, alienPew.$alienPew);
     }
-    const enemyPewRect = enemyPew.$enemyPew.getBoundingClientRect();
+    const alienPewRect = alienPew.$alienPew.getBoundingClientRect();
     const spaceshipRect = document
       .querySelector(".player")
       .getBoundingClientRect();
-    if (collision(spaceshipRect, enemyPewRect)) {
-      deletePew(enemyPewPew, enemyPew, enemyPew.$enemyPew);
-      const spaceship = document.querySelector(".player");
-      const bg = document.querySelector(".main");
-      bg.style = "animation: none;"
-      spaceship.style = "display: none;";
-      
+    if (collision(spaceshipRect, alienPewRect)) {
       state.gameOver = true;
     }
+
     setPosition(
-      enemyPew.$enemyPew,
-      enemyPew.x + state.enemyW / 2,
-      enemyPew.y + 15
+      alienPew.$alienPew,
+      alienPew.x + state.alienW / 2,
+      alienPew.y + 15
     );
   }
 }
@@ -159,43 +154,43 @@ function updatePlayer() {
   }
 }
 
-function createEnemy($container, x, y) {
+function createAlien($container, x, y) {
   const $enemy = document.createElement("img");
   $enemy.src = "assets/alien.png";
   $enemy.className = "enemy";
   $container.appendChild($enemy);
   const cooldown = Math.floor(Math.random() * 100);
   const enemy = { x, y, $enemy, cooldown };
-  state.enemies.push(enemy);
-  setSize($enemy, state.enemyW);
+  state.aliens.push(enemy);
+  setSize($enemy, state.alienW);
   setPosition($enemy, x, y);
 }
 
-function updateEnemy($container) {
-  const dx = Math.sin(Date.now() / 1000) * 90 + 100;
-  const enemies = state.enemies;
-  for (let i = 0; i < enemies.length; i++) {
-    const enemy = enemies[i];
+function updateAlien($container) {
+  const dx = Math.sin(Date.now() / 900) * 90 + 100;
+  const aliens = state.aliens;
+  for (let i = 0; i < aliens.length; i++) {
+    const enemy = aliens[i];
     var a = enemy.x + dx;
     var b = enemy.y - 50;
     setPosition(enemy.$enemy, a, b);
     if (enemy.cooldown == 0) {
-      createEnemyPew($container, a, b);
+      createalienPew($container, a, b);
       enemy.cooldown = Math.floor(Math.random() * 50) + 100;
     }
     enemy.cooldown -= 0.25;
   }
 }
 
-function createEnemies($container) {
-  for (let i = 0; i <= state.enemyNum / 3; i++) {
-    createEnemy($container, i * 80, 100);
+function createaliens($container) {
+  for (let i = 0; i <= state.alienNum / 3; i++) {
+    createAlien($container, i * 80, 100);
   }
-  for (let i = 0; i <= state.enemyNum / 3; i++) {
-    createEnemy($container, i * 80, 180);
+  for (let i = 0; i <= state.alienNum / 3; i++) {
+    createAlien($container, i * 80, 180);
   }
-  for (let i = 0; i <= state.enemyNum / 3; i++) {
-    createEnemy($container, i * 80, 260);
+  for (let i = 0; i <= state.alienNum / 3; i++) {
+    createAlien($container, i * 80, 260);
   }
 }
 
@@ -204,40 +199,49 @@ var reqID;
 function update() {
   updatePlayer();
   updatePew();
-  updateEnemy($container);
-  updateEnemyPew();
+  updateAlien($container);
+  updatealienPew();
 
   window.requestAnimationFrame(update);
 
   if(state.gameOver) {
       document.querySelector(".lose").style = "Display: block;";
-  } else if (state.enemies.length == 0){
+  } else if (state.aliens.length == 0){
     document.querySelector(".win").style = "Display: block;";
   }
 }
 
 const $container = document.querySelector(".main");
 createPlayer($container);
-createEnemies($container);
+createaliens($container);
 
 window.addEventListener("keydown", () => {
-  if (event.keyCode === keyRight) {
-    state.moveRight = true;
-  } else if (event.keyCode === keyLeft) {
-    state.moveLeft = true;
-  } else if (event.keyCode === keySpace) {
-    state.shoot = true;
+  if(!state.gameOver){
+    if (event.keyCode === keyRight) {
+      state.moveRight = true;
+    } else if (event.keyCode === keyLeft) {
+      state.moveLeft = true;
+    } else if (event.keyCode === keySpace) {
+      state.shoot = true;
+    }
+  } else {
+    state.moveRight = false;
+    state.moveLeft = false;
+    state.shoot = false;
   }
+    
 });
 
 window.addEventListener("keyup", () => {
-  if (event.keyCode === keyRight) {
-    state.moveRight = false;
-  } else if (event.keyCode === keyLeft) {
-    state.moveLeft = false;
-  } else if (event.keyCode === keySpace) {
-    state.shoot = false;
-  }
+    if (event.keyCode === keyRight) {
+      state.moveRight = false;
+    } else if (event.keyCode === keyLeft) {
+      state.moveLeft = false;
+    } else if (event.keyCode === keySpace) {
+      state.shoot = false;
+    }
 });
 
 update();
+
+
