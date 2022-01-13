@@ -171,8 +171,8 @@ function updateAlien($container) {
   const aliens = state.aliens;
   for (let i = 0; i < aliens.length; i++) {
     const enemy = aliens[i];
-    var a = enemy.x + dx;
-    var b = enemy.y - 50;
+    let a = enemy.x + dx;
+    let b = enemy.y - 50;
     setPosition(enemy.$enemy, a, b);
     if (enemy.cooldown == 0) {
       createalienPew($container, a, b);
@@ -194,7 +194,7 @@ function createaliens($container) {
   }
 }
 
-var reqID;
+let reqID;
 
 function update() {
   updatePlayer();
